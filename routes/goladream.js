@@ -12,7 +12,7 @@ router.get('/', function(req, res, next) {
         "responseType" : "inChannel"
 
     }
-    res.send(response);
+    res.json(response);
 });
 
 module.exports = router;
