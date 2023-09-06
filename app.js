@@ -11,7 +11,7 @@ var golaRouter = require('./routes/goladream');
 
 var app = express();
 
-// view engine setup!
+// view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 // app.set('view engine', 'njk');
 // nunjucks.configure('views', { 
@@ -39,6 +39,20 @@ app.post('/goladream', function(req, res, next) {
       "text" : choosePlace(),
       "responseType" : "inChannel"
   }
+  res.status(200).json(response);
+});
+
+app.post("/pickanyone", function (req, res, next) {
+  const protypePickList = [req.body.text];
+  const pickList = protypePickList[0].split(',');
+  const pickAnyOne = () => {
+    const randomIndex = Math.floor(Math.random() * pickList.length);
+    return pickList[randomIndex];
+  };
+  const response = {
+    text: pickAnyOne(),
+    responseType: "inChannel",
+  };
   res.status(200).json(response);
 });
 
