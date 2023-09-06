@@ -7,8 +7,12 @@ router.get('/', function(req, res, next) {
         const randomIndex = Math.floor(Math.random() * placeList.length);
         return placeList[randomIndex]
     }
-    res.send(choosePlace())
+    const response = {
+        text : choosePlace(),
+        responseType : "inChannel"
+
+    }
+    res.send(response);
 });
-//2
 
 module.exports = router;
