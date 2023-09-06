@@ -36,7 +36,7 @@ app.post('/goladream', function(req, res, next) {
       return placeList[randomIndex]
   }
   const response = {
-      "text" : choosePlace(),
+      "text" : `딱 봐도 ${choosePlace()}는 맛없는 메뉴겠네요.`,
       "responseType" : "inChannel"
   }
   res.status(200).json(response);
@@ -50,7 +50,7 @@ app.post("/pickanyone", function (req, res, next) {
     return pickList[randomIndex];
   };
   const response = {
-    text: pickAnyOne(),
+    text:`이런..아쉽지만 ${pickAnyOne()}이 선택된걸 어쩌겠어요. 운명이라 생각하고 받아드려야죠.`,
     responseType: "inChannel",
   };
   res.status(200).json(response);
