@@ -6,6 +6,7 @@ var logger = require('morgan');
 const nunjucks = require('nunjucks');
 
 var indexRouter = require('./routes/index');
+var golaRouter = require('./routes/goladream');
 // var usersRouter = require('./routes/users');
 
 var app = express();
@@ -26,6 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 // app.use('/users', usersRouter);
+app.use('/goladream', golaRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -33,9 +35,9 @@ app.use(function(req, res, next) {
 });
 
 //get 요청d22
-app.get('/goladream',function(req,res){
-  res.send('hello world')
-})
+// app.get('/goladream',function(req,res){
+//   res.send('hello world')
+// })
 
 // error handler
 app.use(function(err, req, res, next) {
