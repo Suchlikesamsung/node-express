@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
         const randomIndex = Math.floor(Math.random() * placeList.length);
         return placeList[randomIndex]
     }
-    res.send(choosePlace)
+    res.send(choosePlace())
 });
 //2
 
