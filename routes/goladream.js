@@ -9,5 +9,6 @@ router.get('/', function(req, res, next) {
     }
     res.send(choosePlace)
 });
+//2
 
 module.exports = router;
