@@ -33,7 +33,6 @@ app.use(function(req, res, next) {
 });
 
 //get 요청d22
-
 app.get('/goladream',function(req,res){
   res.send('hello world')
 })
