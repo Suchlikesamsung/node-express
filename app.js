@@ -32,7 +32,7 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
-//get 요청d2
+//get 요청d22
 
 app.get('/goladream',function(req,res){
   res.send('hello world')
