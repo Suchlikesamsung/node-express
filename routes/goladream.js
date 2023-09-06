@@ -8,8 +8,8 @@ router.get('/', function(req, res, next) {
         return placeList[randomIndex]
     }
     const response = {
-        text : choosePlace(),
-        responseType : "inChannel"
+        "text" : choosePlace(),
+        "responseType" : "inChannel"
 
     }
     res.send(response);
