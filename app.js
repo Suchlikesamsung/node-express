@@ -1,6 +1,14 @@
 require('dotenv').config(); // 환경 변수 로드
 
-const dbUrl = process.env.DB_URL;
+
+const oracledb = require('oracledb');
+const dbConfig = {
+  user: process.env.DB_USERID,
+  password : process.env.DB_USERPASSWORD,
+  connectString : process.env.DB_URL,
+};
+
+
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
@@ -12,6 +20,8 @@ const logger = require('morgan');
 const golaRouter = require('./routes/goladream');
 const pickRouter = require('./routes/pickanyone');
 const indexRouter = require('./routes/index');
+const dbtest = require('./routes/dbtest')
+
 
 const app = express();
 
@@ -23,12 +33,28 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+let dbPool
+
+oracledb.createPool(dbConfig, (err, pool) => {
+  if (err) {
+    console.error('커넥션 풀 생성 에러: ', err.message);
+    return;
+  }
+  console.log('커넥션 풀 생성 성공!');
+  app.set('dbPool',pool)
+});
+
+
 
 app.use('/', golaRouter);
 
 app.use('/', indexRouter);
 
 app.use('/', pickRouter);
+
+app.use('/', dbtest)
+
+
 
 // app.use('/users', usersRouter);
 // app.post('/goladream', function(req, res, next) {
@@ -88,7 +114,22 @@ app.use(function(err, req, res, next) {
   res.send(JSON.stringify(errorResponse));
 });
 
-console.log(`${dbUrl} 잘되나???` )
+
+// 커넥션 풀 종료 핸들러
+
+process.on('exit', () => {
+  if (dbPool) {
+    dbPool.close((err) => {
+      if (err) {
+        console.error('커넥션 풀 종료 중 오류가 발생했어요: ', err.message);
+      } else {
+        console.log('커넥션 풀 종료!.');
+      }
+    });
+  }
+});
+
+
 
 
 module.exports = app;
