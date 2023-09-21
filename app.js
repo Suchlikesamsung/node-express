@@ -1,60 +1,49 @@
-require('dotenv').config(); // 환경 변수 로드
+require("dotenv").config(); // 환경 변수 로드
 
-
-const oracledb = require('oracledb');
+const oracledb = require("oracledb");
 const dbConfig = {
   user: process.env.DB_USERID,
-  password : process.env.DB_USERPASSWORD,
-  connectString : process.env.DB_URL,
+  password: process.env.DB_USERPASSWORD,
+  connectString: process.env.DB_URL,
 };
 
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
 
-const createError = require('http-errors');
-const express = require('express');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-
-
-
-const golaRouter = require('./routes/goladream');
-const pickRouter = require('./routes/pickanyone');
-const indexRouter = require('./routes/index');
-const dbtest = require('./routes/dbtest')
-
+const golaRouter = require("./routes/goladream");
+const pickRouter = require("./routes/pickanyone");
+const indexRouter = require("./routes/index");
+const dbtest = require("./routes/dbtest");
 
 const app = express();
 
-
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-
-let dbPool
+let dbPool;
 
 oracledb.createPool(dbConfig, (err, pool) => {
   if (err) {
-    console.error('커넥션 풀 생성 에러: ', err.message);
+    console.error("커넥션 풀 생성 에러: ", err.message);
     return;
   }
-  console.log('커넥션 풀 생성 성공!');
-  app.set('dbPool',pool)
+  console.log("커넥션 풀 생성 성공!");
+  app.set("dbPool", pool);
 });
 
+app.use("/", golaRouter);
 
+app.use("/", indexRouter);
 
-app.use('/', golaRouter);
+app.use("/", pickRouter);
 
-app.use('/', indexRouter);
-
-app.use('/', pickRouter);
-
-app.use('/', dbtest)
-
-
+app.use("/", dbtest);
 
 // app.use('/users', usersRouter);
 // app.post('/goladream', function(req, res, next) {
@@ -87,9 +76,64 @@ app.use('/', dbtest)
 // });
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
+
+const axios = require("axios");
+
+function runCode() {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const formatTime =
+    (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+  const hookUrl =
+    "https://hook.dooray.com/services/3241943531530916096/3631380616712603191/wqFZJEBLStuIA1ynMqY8DA";
+  const payload = {
+    botName: "퇴근시간 알림",
+    botIconImage: "https://static.dooray.com/static_images/dooray-bot.png",
+    text: `현재 시각 ${formatTime} 입니다 퇴근까지 ${18 - hours}남았습니다. `,
+  };
+  const payload2 = {
+    botName: "퇴근시간 알림",
+    botIconImage: "https://static.dooray.com/static_images/dooray-bot.png",
+    text: `점심시간 점심시간 초 비상 점심시간 점심시간 점심시간 `,
+  };
+
+  // 시간이 9 이상 18 이하인 경우에만 코드 실행
+  if (hours >= 9 && hours <= 18) {
+    axios
+      .post(hookUrl, payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+  if (formatTime == "11:30") {
+    axios
+      .post(hookUrl, payload2, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log("Response:", response.data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+}
+
+// 1시간마다 코드 실행
+setInterval(runCode, 60 * 60 * 1000); // 1시간(60분) = 60 * 60 * 1000 밀리초
 
 //get 요청d
 // app.get('/goladream',function(req,res){
@@ -97,14 +141,14 @@ app.use(function(req, res, next) {
 // })
 
 // 오류 핸들러
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // 응답의 컨텐츠 타입을 JSON으로 설정합니다.
-  res.setHeader('Content-Type', 'application/json');
+  res.setHeader("Content-Type", "application/json");
 
   // 에러 정보를 포함한 JSON 응답을 생성합니다.
   const errorResponse = {
     message: err.message,
-    error: req.app.get('env') === 'development' ? err : {}
+    error: req.app.get("env") === "development" ? err : {},
   };
 
   // 상태 코드를 에러 상태로 설정하거나, 사용 가능한 경우 500 (내부 서버 오류)로 설정합니다.
@@ -114,22 +158,18 @@ app.use(function(err, req, res, next) {
   res.send(JSON.stringify(errorResponse));
 });
 
-
 // 커넥션 풀 종료 핸들러
 
-process.on('exit', () => {
+process.on("exit", () => {
   if (dbPool) {
     dbPool.close((err) => {
       if (err) {
-        console.error('커넥션 풀 종료 중 오류가 발생했어요: ', err.message);
+        console.error("커넥션 풀 종료 중 오류가 발생했어요: ", err.message);
       } else {
-        console.log('커넥션 풀 종료!.');
+        console.log("커넥션 풀 종료!.");
       }
     });
   }
 });
-
-
-
 
 module.exports = app;
