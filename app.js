@@ -12,6 +12,9 @@ const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
+const schedule = require('node-schedule');
+
+
 
 const golaRouter = require("./routes/goladream");
 const pickRouter = require("./routes/pickanyone");
@@ -133,10 +136,13 @@ function checkTimeAndSendMessages() {
 }
 
 // 정각마다 실행
-const now = new Date();
-const minutesUntilNextHour = 60 - now.getMinutes();
-const initialDelay = minutesUntilNextHour * 60 * 1000; // 분을 밀리초로 변환
-setTimeout(checkTimeAndSendMessages, initialDelay);
+// const now = new Date();
+// const minutesUntilNextHour = 60 - now.getMinutes();
+// const initialDelay = minutesUntilNextHour * 60 * 1000; // 분을 밀리초로 변환
+// setTimeout(checkTimeAndSendMessages, 1000);
+
+
+const job = schedule.scheduleJob('0 * * * *', checkTimeAndSendMessages);
 
 
 
