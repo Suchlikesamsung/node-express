@@ -132,8 +132,11 @@ function checkTimeAndSendMessages() {
 
 }
 
-// 1시간마다 코드 실행
-setInterval(checkTimeAndSendMessages, 60 * 60 * 1000); // 1시간(60분) = 60 * 60 * 1000 밀리초
+// 정각마다 실행
+const now = new Date();
+const minutesUntilNextHour = 60 - now.getMinutes();
+const initialDelay = minutesUntilNextHour * 60 * 1000; // 분을 밀리초로 변환
+setTimeout(checkTimeAndSendMessages, initialDelay);
 
 
 
