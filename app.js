@@ -1,11 +1,11 @@
-require("dotenv").config(); // 환경 변수 로드
+// require("dotenv").config(); // 환경 변수 로드
 
-const oracledb = require("oracledb");
-const dbConfig = {
-  user: process.env.DB_USERID,
-  password: process.env.DB_USERPASSWORD,
-  connectString: process.env.DB_URL,
-};
+// const oracledb = require("oracledb");
+// const dbConfig = {
+//   user: process.env.DB_USERID,
+//   password: process.env.DB_USERPASSWORD,
+//   connectString: process.env.DB_URL,
+// };
 
 const createError = require("http-errors");
 const express = require("express");
@@ -26,16 +26,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-let dbPool;
+// let dbPool;
 
-oracledb.createPool(dbConfig, (err, pool) => {
-  if (err) {
-    console.error("커넥션 풀 생성 에러: ", err.message);
-    return;
-  }
-  console.log("커넥션 풀 생성 성공!");
-  app.set("dbPool", pool);
-});
+// oracledb.createPool(dbConfig, (err, pool) => {
+//   if (err) {
+//     console.error("커넥션 풀 생성 에러: ", err.message);
+//     return;
+//   }
+//   console.log("커넥션 풀 생성 성공!");
+//   app.set("dbPool", pool);
+// });
 
 app.use("/", golaRouter);
 
