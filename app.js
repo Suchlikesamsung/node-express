@@ -80,60 +80,63 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+
 const axios = require("axios");
 
-function runCode() {
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const formatTime =
-    (hours < 10 ? "0" : "") + hours + ":" + (minutes < 10 ? "0" : "") + minutes;
+function sendDoorayMessage(botName, text) {
   const hookUrl =
     "https://hook.dooray.com/services/3241943531530916096/3631380616712603191/wqFZJEBLStuIA1ynMqY8DA";
   const payload = {
-    botName: "퇴근시간 알림",
+    botName,
     botIconImage: "https://static.dooray.com/static_images/dooray-bot.png",
-    text: `현재 시각 ${formatTime} 입니다 퇴근까지 ${18 - hours}남았습니다. `,
-  };
-  const payload2 = {
-    botName: "퇴근시간 알림",
-    botIconImage: "https://static.dooray.com/static_images/dooray-bot.png",
-    text: `점심시간 점심시간 초 비상 점심시간 점심시간 점심시간 `,
+    text,
   };
 
-  // 시간이 9 이상 18 이하인 경우에만 코드 실행
-  if (hours >= 9 && hours <= 18) {
-    axios
-      .post(hookUrl, payload, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Response:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+  axios
+    .post(hookUrl, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      console.log("Response:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+
+function checkTimeAndSendMessages() {
+  const now = new Date();
+  const hours = now.getHours();
+  const minutes = now.getMinutes();
+  const formatTime = `${(hours < 10 ? "0" : "") + hours}:${(minutes < 10 ? "0" : "") + minutes}`;
+
+  // 현재 시간 출력
+  console.log(`현재 시각 ${formatTime}`);
+
+  // 퇴근 시간 확인 및 메시지 전송
+  if (hours >= 9 && hours < 18) {
+    const remainingHours = 18 - hours;
+    sendDoorayMessage("잔여시간 알림", `현재 시각 ${formatTime} 입니다. 퇴근까지 ${remainingHours}시간 남았습니다.`);
   }
-  if (formatTime == "11:30") {
-    axios
-      .post(hookUrl, payload2, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log("Response:", response.data);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+
+  // 점심시간 확인 및 메시지 전송
+  if (formatTime === "11:30") {
+    sendDoorayMessage("점심시간 알림", "점심시간 초 비상 점심시간 점심시간 점심시간");
   }
+
+  if (formatTime === "18:00") {
+    sendDoorayMessage("퇴근시간 알림", "퇴근시간인데 아직 퇴근못하는 흑우 읍제 ㅋㅋㅋ?")
+  }
+
 }
 
 // 1시간마다 코드 실행
-setInterval(runCode, 60 * 60 * 1000); // 1시간(60분) = 60 * 60 * 1000 밀리초
+setInterval(checkTimeAndSendMessages, 60 * 60 * 1000); // 1시간(60분) = 60 * 60 * 1000 밀리초
+
+
+
 
 //get 요청d
 // app.get('/goladream',function(req,res){
