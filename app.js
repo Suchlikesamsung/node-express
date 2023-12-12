@@ -20,6 +20,7 @@ const golaRouter = require("./routes/goladream");
 const pickRouter = require("./routes/pickanyone");
 const indexRouter = require("./routes/index");
 const dbtest = require("./routes/dbtest");
+const userRouter = require("./routes/userdata");
 
 const app = express();
 
@@ -47,6 +48,8 @@ app.use("/", indexRouter);
 app.use("/", pickRouter);
 
 app.use("/", dbtest);
+
+app.use("/",userRouter);
 
 // app.use('/users', usersRouter);
 // app.post('/goladream', function(req, res, next) {
@@ -117,7 +120,7 @@ function checkTimeAndSendMessages() {
 
   // 현재 시간 출력
   console.log(`현재 시각 ${formatTime}`);
-
+  // s3 이관 작업
   // 퇴근 시간 확인 및 메시지 전송
   if (hours >= 9 && hours < 18) {
     const remainingHours = 18 - hours;
